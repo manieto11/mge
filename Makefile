@@ -60,6 +60,16 @@ endif
 INCLUDE := -I$(INC_DIR)
 WIN_INC := -I$(SDL_DIR)/include -I$(VK_DIR)/include -I$(VMA_DIR)/include
 
+#-- Libraries
+
+LIBS := -L$(LIB_DIR) -lmge
+
+ifeq ($(OS),Windows_NT)
+    LIBS += -L$(SDL_LIB_DIR) -lSDL3 -L$(VK_LIB_DIR) -lvulkan-1
+else
+    LIBS += -lSDL3 -lvulkan
+endif
+
 #-- Objects
 
 ifeq ($(DIMENSIONS),2D)
@@ -114,10 +124,12 @@ $(LIB_DIR)/libmge.a: $(LIB_OBJ)
 #   -- Executable
 $(BIN_DIR)/test.exe: $(LIB_DIR)/libmge.a $(TST_DIR)/main.cpp
 	$(call MKDIR,$(@D))
-	$(CXX) $(CPP_FLAGS) $(INCLUDE) $(TST_DIR)/main.cpp -L$(LIB_DIR) -lmge -L$(SDL_LIB_DIR) -lSDL3 -L$(VK_LIB_DIR) -lvulkan-1 -o $@
+	$(CXX) $(CPP_FLAGS) $(INCLUDE) $(TST_DIR)/main.cpp $(LIBS) -o $@
 
 test: $(BIN_DIR)/test.exe
+ifeq ($(OS),Windows_NT)
 	$(call COPY,$(SDL_LIB_DIR)/SDL3.dll,$(BIN_DIR))
+endif
 	$(BIN_DIR)/test.exe
 
 #   -- Clean
