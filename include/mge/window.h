@@ -1,14 +1,20 @@
 #ifndef MGE_WINDOW_H
 #define MGE_WINDOW_H
 
+#include <string>
+
 namespace mge
 {
     class Window
     {
     public:
-        static bool Create(const char *name, int width, int height);
+        Window(const std::string name, int width, int height);
+        ~Window();
+
+        static void Create(const std::string name, int width, int height);
         static bool ShouldClose();
         static void Close();
+        static void Destroy();
 
         static void BeginFrame();
         static void EndFrame();

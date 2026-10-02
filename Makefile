@@ -9,26 +9,10 @@ DIMENSIONS := 3D
 
 BIN_DIR := ./bin
 BLD_DIR := ./bld
-EXT_DIR := ./external
 INC_DIR := ./include
 LIB_DIR := ./lib
 SRC_DIR := ./src
 TST_DIR := ./test
-
-BOX2D_DIR := $(EXT_DIR)/box2d
-BOX3D_DIR := $(EXT_DIR)/box3d
-FT_DIR    := $(EXT_DIR)/freetype
-GLM_DIR   := $(EXT_DIR)/glm
-JSON_DIR  := $(EXT_DIR)/json
-KTX_DIR   := $(EXT_DIR)/KTX-Software
-MA_DIR    := $(EXT_DIR)/miniaudio
-SDL_DIR   := $(EXT_DIR)/SDL
-TOL_DIR   := $(EXT_DIR)/tinyobjloader
-VK_DIR    := $(EXT_DIR)/Vulkan-Headers
-VMA_DIR   := $(EXT_DIR)/VulkanMemoryAllocator
-
-SDL_LIB_DIR := "C:\SDL3\3.4.14\lib\x64"
-VK_LIB_DIR := "C:\VulkanSDK\1.4.341.1\Lib"
 
 #-- Compilers
 
@@ -42,6 +26,8 @@ ifdef DEBUG
     C_FLAGS   += -g -DDEBUG
     CPP_FLAGS += -g -DDEBUG
 endif
+
+PKG_CONFIG := pkg-config
 
 #-- OS-Specific Macros (DRY)
 # We define these once to avoid repeating ifeq blocks in every single target
@@ -58,17 +44,10 @@ endif
 #-- Include
 
 INCLUDE := -I$(INC_DIR)
-WIN_INC := -I$(SDL_DIR)/include -I$(VK_DIR)/include -I$(VMA_DIR)/include
 
 #-- Libraries
 
-LIBS := -L$(LIB_DIR) -lmge
-
-ifeq ($(OS),Windows_NT)
-    LIBS += -L$(SDL_LIB_DIR) -lSDL3 -L$(VK_LIB_DIR) -lvulkan-1
-else
-    LIBS += -lSDL3 -lvulkan
-endif
+LIBS := -L$(LIB_DIR) -lmge $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
 
 #-- Objects
 
@@ -93,7 +72,6 @@ LIB_OBJ := $(CORE_OBJS) $(PHY_OBJS)
 #-- Target-Specific Variables
 # Append specific flags ONLY when compiling these exact files
 $(BLD_DIR)/physics.o: CPP_FLAGS += $(PHY_INC) $(PHY_FLAGS)
-$(BLD_DIR)/window.o:  CPP_FLAGS += $(WIN_INC)
 
 #-- Rules
 
@@ -127,9 +105,6 @@ $(BIN_DIR)/test.exe: $(LIB_DIR)/libmge.a $(TST_DIR)/main.cpp
 	$(CXX) $(CPP_FLAGS) $(INCLUDE) $(TST_DIR)/main.cpp $(LIBS) -o $@
 
 test: $(BIN_DIR)/test.exe
-ifeq ($(OS),Windows_NT)
-	$(call COPY,$(SDL_LIB_DIR)/SDL3.dll,$(BIN_DIR))
-endif
 	$(BIN_DIR)/test.exe
 
 #   -- Clean
