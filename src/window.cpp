@@ -522,7 +522,9 @@ namespace mge
         swapchain_images.resize(image_count);
         check_vk(vkGetSwapchainImagesKHR(device, swapchain, &image_count, swapchain_images.data()), "vkGetSwapchainImagesKHR");
 
+#ifndef NDEBUG
         std::cout << "Swapchain created with " << swapchain_images.size() << " image(s), " << swapchain_extent.width << 'x' << swapchain_extent.height << ".\n";
+#endif
     }
 
     bool Window::ShouldClose()

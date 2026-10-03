@@ -23,8 +23,9 @@ C_FLAGS   :=
 CPP_FLAGS := -O2 -std=c++20
 
 ifdef DEBUG
-    C_FLAGS   += -g -DDEBUG
-    CPP_FLAGS += -g -DDEBUG
+    CPP_FLAGS += -g
+else
+	CPP_FLAGS += -DNDEBUG
 endif
 
 PKG_CONFIG := pkg-config
@@ -55,12 +56,10 @@ ifeq ($(DIMENSIONS),2D)
     PHY_SRCS  := $(wildcard $(BOX2D_DIR)/src/*.c)
     PHY_OBJS  := $(patsubst $(BOX2D_DIR)/src/%.c, $(BLD_DIR)/box2d/%.o, $(PHY_SRCS))
     PHY_FLAGS := -DDIM2D
-    PHY_INC   := -I$(BOX2D_DIR)/include
 else
     PHY_SRCS  := $(wildcard $(BOX3D_DIR)/src/*.c)
     PHY_OBJS  := $(patsubst $(BOX3D_DIR)/src/%.c, $(BLD_DIR)/box3d/%.o, $(PHY_SRCS))
-    PHY_FLAGS :=
-    PHY_INC   := -I$(BOX3D_DIR)/include
+    PHY_FLAGS := -DDIM3D
 endif
 
 # Automatically grab all .cpp files in src/ so you don't have to add them manually
@@ -71,7 +70,7 @@ LIB_OBJ := $(CORE_OBJS) $(PHY_OBJS)
 
 #-- Target-Specific Variables
 # Append specific flags ONLY when compiling these exact files
-$(BLD_DIR)/physics.o: CPP_FLAGS += $(PHY_INC) $(PHY_FLAGS)
+$(BLD_DIR)/physics.o: CPP_FLAGS += $(PHY_FLAGS)
 
 #-- Rules
 
