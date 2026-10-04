@@ -30,17 +30,10 @@ endif
 
 PKG_CONFIG := pkg-config
 
-#-- OS-Specific Macros (DRY)
-# We define these once to avoid repeating ifeq blocks in every single target
-ifeq ($(OS),Windows_NT)
-    MKDIR = @if not exist "$(subst /,\,$1)" mkdir "$(subst /,\,$1)"
-    RMDIR = @if exist "$(subst /,\,$1)" rmdir /S /Q "$(subst /,\,$1)"
-	COPY  = @copy /Y "$(subst /,\,$1)" "$(subst /,\,$2)" > nul
-else
-    MKDIR = @mkdir -p $1
-    RMDIR = @rm -fr $1
-	COPY  = cp $1 $2
-endif
+#-- Macros
+MKDIR = @mkdir -p $1
+RMDIR = @rm -fr $1
+COPY  = @cp $1 $2
 
 #-- Include
 
