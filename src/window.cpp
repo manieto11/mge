@@ -25,6 +25,8 @@ namespace mge
 #endif
         VkDevice device;
         VkSwapchainKHR swapchain;
+        std::vector<VkImageView> swapchain_image_views;
+        VkRenderPass render_pass;
 
         void handle_key(GLFWwindow *window, int key, int, int action, int)
         {
@@ -525,6 +527,88 @@ namespace mge
 #ifndef NDEBUG
         std::cout << "Swapchain created with " << swapchain_images.size() << " image(s), " << swapchain_extent.width << 'x' << swapchain_extent.height << ".\n";
 #endif
+
+        swapchain_image_views.reserve(swapchain_images.size());
+
+        for (VkImage image : swapchain_images)
+        {
+            VkImageViewCreateInfo image_view_info{
+                .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+                .image = image,
+                .viewType = VK_IMAGE_VIEW_TYPE_2D,
+                .format = surface_format.format,
+                .components = VkComponentMapping{
+                    .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .a = VK_COMPONENT_SWIZZLE_IDENTITY,
+                },
+                .subresourceRange = VkImageSubresourceRange{
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .baseMipLevel = 0,
+                    .levelCount = 1,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1,
+                },
+            };
+
+            VkImageView image_view = VK_NULL_HANDLE;
+            check_vk(vkCreateImageView(device, &image_view_info, nullptr, &image_view), "vkCreateImageView");
+
+            swapchain_image_views.push_back(image_view);
+        }
+
+#ifndef NDEBUG
+        std::cout << "Created " << swapchain_image_views.size() << " swapchain image view(s).\n";
+#endif
+
+        VkAttachmentDescription color_attachment{
+            .format = surface_format.format,
+            .samples = VK_SAMPLE_COUNT_1_BIT,
+            .loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            .storeOp = VK_ATTACHMENT_STORE_OP_STORE,
+            .stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+            .stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE,
+            .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+            .finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        };
+
+        VkAttachmentReference color_attachment_reference{
+            .attachment = 0,
+            .layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+        };
+
+        VkSubpassDescription subpass{
+            .pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS,
+            .colorAttachmentCount = 1,
+            .pColorAttachments = &color_attachment_reference,
+        };
+
+        VkSubpassDependency dependency{
+            .srcSubpass = VK_SUBPASS_EXTERNAL,
+            .dstSubpass = 0,
+            .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+            .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+            .srcAccessMask = 0,
+            .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+        };
+
+        VkRenderPassCreateInfo render_pass_info{
+            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO,
+            .attachmentCount = 1,
+            .pAttachments = &color_attachment,
+            .subpassCount = 1,
+            .pSubpasses = &subpass,
+            .dependencyCount = 1,
+            .pDependencies = &dependency,
+        };
+
+        render_pass = VK_NULL_HANDLE;
+        check_vk(vkCreateRenderPass(device, &render_pass_info, nullptr, &render_pass), "vkCreateRenderPass");
+
+#ifndef NDEBUG
+        std::cout << "Render pass created successfully.\n";
+#endif
     }
 
     bool Window::ShouldClose()
@@ -568,11 +652,11 @@ namespace mge
         // {
         //     vkDestroyFramebuffer(device, framebuffer, nullptr);
         // }
-        // vkDestroyRenderPass(device, render_pass, nullptr);
-        // for (VkImageView image_view : swapchain_image_views)
-        // {
-        //     vkDestroyImageView(device, image_view, nullptr);
-        // }
+        vkDestroyRenderPass(device, render_pass, nullptr);
+        for (VkImageView image_view : swapchain_image_views)
+        {
+            vkDestroyImageView(device, image_view, nullptr);
+        }
         vkDestroySwapchainKHR(device, swapchain, nullptr);
         vkDestroyDevice(device, nullptr);
 #ifdef VK_ENABLE_VALIDATION
