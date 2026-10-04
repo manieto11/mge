@@ -22,7 +22,7 @@ CXX := g++
 C_FLAGS   :=
 CPP_FLAGS := -O2 -std=c++20
 
-ifdef DEBUG
+ifeq ($(DEBUG),true)
     CPP_FLAGS += -g
 else
 	CPP_FLAGS += -DNDEBUG
