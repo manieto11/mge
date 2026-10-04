@@ -1,7 +1,8 @@
 #include "mge/window.h"
 
-#include "vulkan/vulkan.h"
-#include <GLFW/glfw3.h>
+#define GLFW_INCLUDE_VULKAN
+#include "GLFW/glfw3.h"
+#include "utils.h"
 
 #include <format>
 #include <iostream>
@@ -14,8 +15,6 @@ namespace mge
 {
     namespace
     {
-        GLFWwindow *window = nullptr;
-
         VkInstance instance;
         VkSurfaceKHR surface;
 #ifdef VK_ENABLE_VALIDATION
@@ -274,7 +273,7 @@ namespace mge
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-        GLFWwindow *window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+        window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 
         if (window == nullptr)
         {

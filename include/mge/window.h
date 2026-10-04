@@ -24,6 +24,6 @@ namespace mge
 
         static void SetBackgroundColor(float r, float g, float b);
     };
-}
+} // namespace mge
 
 #endif
