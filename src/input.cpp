@@ -25,7 +25,7 @@ namespace mge
         modifiedKeys[0].push_back(key);
     }
 
-    void mouse_callback(GLFWwindow* window, int button, int action, int mods)
+    void mouse_callback(GLFWwindow *window, int button, int action, int mods)
     {
         if (button >= (int)mge::MouseButton::SIZE)
             return;
@@ -38,6 +38,12 @@ namespace mge
         Input::Initialize();
     }
 
+    Input::Input(void *window)
+    {
+        mge::window = (GLFWwindow *)window;
+        Initialize();
+    }
+
     Input::~Input()
     {
         Input::Finalize();
@@ -47,7 +53,7 @@ namespace mge
     {
         if (window == nullptr)
             throw std::runtime_error("Window not initialized!");
-            
+
         modifiedKeys[0].reserve(16);
         modifiedKeys[1].reserve(16);
         glfwSetKeyCallback(window, key_callback);
@@ -63,18 +69,24 @@ namespace mge
 #endif
     }
 
+    void Input::Initialize(void *window)
+    {
+        mge::window = (GLFWwindow *)window;
+        Initialize();
+    }
+
     void Input::Update()
     {
         glfwPollEvents();
 
-        for (const int& key : modifiedKeys[1])
+        for (const int &key : modifiedKeys[1])
         {
             prevKeyValue[key] = currKeyValue[key];
         }
 
         modifiedKeys[1].clear();
 
-        for (const int& key : modifiedKeys[0])
+        for (const int &key : modifiedKeys[0])
         {
             prevKeyValue[key] = currKeyValue[key];
             currKeyValue[key] = glfwGetKey(window, key);
@@ -83,14 +95,14 @@ namespace mge
 
         modifiedKeys[0].clear();
 
-        for (const int& button : modifiedMouseButtons[1])
+        for (const int &button : modifiedMouseButtons[1])
         {
             prevMouseButtonValue[button] = currMouseButtonValue[button];
         }
 
         modifiedMouseButtons[1].clear();
 
-        for (const int& button : modifiedMouseButtons[0])
+        for (const int &button : modifiedMouseButtons[0])
         {
             prevMouseButtonValue[button] = currMouseButtonValue[button];
             currMouseButtonValue[button] = glfwGetMouseButton(window, button);

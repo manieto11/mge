@@ -12,9 +12,11 @@ namespace mge
     {
     public:
         Input();
+        Input(void *window);
         ~Input();
 
         static void Initialize();
+        static void Initialize(void *window);
         static void Update();
         static void Finalize();
 
