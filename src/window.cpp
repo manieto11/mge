@@ -29,10 +29,14 @@ namespace mge
         VkRenderPass render_pass = VK_NULL_HANDLE;
         std::vector<VkFramebuffer> swapchain_frame_buffers;
         VkCommandPool command_pool = VK_NULL_HANDLE;
-        VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
+        VkCommandBuffer command_buffer = VK_NULL_HANDLE;
         VkSemaphore image_available_semaphore = VK_NULL_HANDLE;
         std::vector<VkSemaphore> render_finished_semaphores;
         VkFence in_flight_fence = VK_NULL_HANDLE;
+        uint32_t image_index = 0;
+        VkQueue graphics_queue = VK_NULL_HANDLE;
+        VkQueue present_queue = VK_NULL_HANDLE;
+        VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
 
         void check_vk(VkResult result, const char *operation)
         {
@@ -478,8 +482,8 @@ namespace mge
             device = VK_NULL_HANDLE;
             check_vk(vkCreateDevice(selected_device, &device_info, nullptr, &device), "vkCreateDevice");
 
-            VkQueue graphics_queue = VK_NULL_HANDLE;
-            VkQueue present_queue = VK_NULL_HANDLE;
+            graphics_queue = VK_NULL_HANDLE;
+            present_queue = VK_NULL_HANDLE;
 
             vkGetDeviceQueue(device, *selected_queue_families.graphics, 0, &graphics_queue);
             vkGetDeviceQueue(device, *selected_queue_families.present, 0, &present_queue);
@@ -663,7 +667,7 @@ namespace mge
                 .commandBufferCount = 1,
             };
 
-            check_vk(vkAllocateCommandBuffers(device, &allocate_info, &commandBuffer), "vkAllocateCommandBuffers");
+            check_vk(vkAllocateCommandBuffers(device, &allocate_info, &command_buffer), "vkAllocateCommandBuffers");
 
 #ifndef NDEBUG
             std::cout << "Command buffers allocated successfully.\n";
@@ -715,22 +719,6 @@ namespace mge
 
     void Window::Destroy()
     {
-        // Vulkan objects must be destroyed explicitly, in dependency order.
-        // check_vk(vkDeviceWaitIdle(device), "vkDeviceWaitIdle");
-
-        // vkFreeCommandBuffers(device, command_pool, static_cast<uint32_t>(command_buffers.size()), command_buffers.data());
-        //
-        // vkUnmapMemory(device, uniform_memory);
-        // vkDestroyDescriptorPool(device, descriptor_pool, nullptr);
-        // vkDestroyBuffer(device, uniform_buffer, nullptr);
-        // vkFreeMemory(device, uniform_memory, nullptr);
-        // vkDestroyBuffer(device, index_buffer, nullptr);
-        // vkFreeMemory(device, index_memory, nullptr);
-        // vkDestroyBuffer(device, vertex_buffer, nullptr);
-        // vkFreeMemory(device, vertex_memory, nullptr);
-        // vkDestroyPipeline(device, graphics_pipeline, nullptr);
-        // vkDestroyPipelineLayout(device, pipeline_layout, nullptr);
-        // vkDestroyDescriptorSetLayout(device, descriptor_set_layout, nullptr);
         if (device != VK_NULL_HANDLE)
         {
             vkDeviceWaitIdle(device);
@@ -799,13 +787,86 @@ namespace mge
         glfwTerminate();
     }
 
-    void Window::BeginFrame() {}
+    void Window::BeginFrame()
+    {
+        check_vk(vkWaitForFences(device, 1, &in_flight_fence, VK_TRUE, UINT64_MAX), "vkWaitForFences");
 
-    void Window::EndFrame() {}
+        image_index = 0;
+        VkResult acquire_result = vkAcquireNextImageKHR(device, swapchain, UINT64_MAX, image_available_semaphore, VK_NULL_HANDLE, &image_index);
+
+        if (acquire_result != VK_SUCCESS && acquire_result != VK_SUBOPTIMAL_KHR)
+        {
+            check_vk(acquire_result, "vkAcquireNextImageKHR");
+        }
+
+        check_vk(vkResetFences(device, 1, &in_flight_fence), "vkResetFences");
+
+        check_vk(vkResetCommandBuffer(command_buffer, 0), "vkResetCommandBuffer");
+
+        VkCommandBufferBeginInfo begin_info{
+            .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+        };
+        check_vk(vkBeginCommandBuffer(command_buffer, &begin_info), "vkBeginCommandBuffer");
+
+        VkRenderPassBeginInfo render_pass_info{
+            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+            .renderPass = render_pass,
+            .framebuffer = swapchain_frame_buffers[image_index],
+            .renderArea{
+                .offset = {0, 0},
+                .extent = swapchain_extent,
+            },
+            .clearValueCount = 1,
+            .pClearValues = &clear_color,
+        };
+
+        vkCmdBeginRenderPass(command_buffer, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+    }
+
+    void Window::EndFrame()
+    {
+        vkCmdEndRenderPass(command_buffer);
+
+        check_vk(vkEndCommandBuffer(command_buffer), "vkEndCommandBuffer");
+
+        VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+        VkSubmitInfo submit_info{
+            .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+            .waitSemaphoreCount = 1,
+            .pWaitSemaphores = &image_available_semaphore,
+            .pWaitDstStageMask = &wait_stage,
+            .commandBufferCount = 1,
+            .pCommandBuffers = &command_buffer,
+            .signalSemaphoreCount = 1,
+            .pSignalSemaphores = &render_finished_semaphores[image_index],
+        };
+
+        check_vk(vkQueueSubmit(graphics_queue, 1, &submit_info, in_flight_fence), "vkQueueSubmit");
+
+        VkPresentInfoKHR present_info{
+            .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+            .waitSemaphoreCount = 1,
+            .pWaitSemaphores =
+                &render_finished_semaphores[image_index],
+            .swapchainCount = 1,
+            .pSwapchains = &swapchain,
+            .pImageIndices = &image_index,
+        };
+
+        VkResult present_result = vkQueuePresentKHR(present_queue, &present_info);
+        if (present_result != VK_SUCCESS && present_result != VK_SUBOPTIMAL_KHR)
+        {
+            check_vk(present_result, "vkQueuePresentKHR");
+        }
+    }
 
     void Window::Draw2D() {}
 
     void Window::Draw3D() {}
 
-    void Window::SetBackgroundColor(float, float, float) {}
+    void Window::SetBackgroundColor(float r, float g, float b)
+    {
+        clear_color = {{{r, g, b, 1.0f}}};
+    }
 }

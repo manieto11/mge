@@ -10,6 +10,8 @@ int main()
         mge::Window window("test", 800, 600);
         mge::Input input;
 
+        window.SetBackgroundColor(0, 0, 0);
+
         while (!window.ShouldClose())
         {
             input.Update();
@@ -22,10 +24,9 @@ int main()
             else if (input.MousePressed(mge::MouseButton::RIGHT))
                 input.ShowCursor();
 
-            if (input.MouseDelta() != glm::vec2(0))
-                std::cout << input.MousePositionX() << ", " << input.MousePositionY() << "\n";
+            window.BeginFrame();
 
-            // std::this_thread::yield();
+            window.EndFrame();
         }
     }
     catch (const std::exception &e)
