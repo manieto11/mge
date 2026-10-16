@@ -23,6 +23,16 @@ namespace mge
 	vk::CommandBuffer commandBuffer = VK_NULL_HANDLE;
 #pragma endregion
 
+	Window::Window(const std::string name, int width, int height)
+	{
+		Window::Create(name, width, height);
+	}
+
+	Window::~Window()
+	{
+		Window::Destroy();
+	}
+
 	void Window::Create(const std::string name, int width, int height)
 	{
 		try
@@ -97,6 +107,16 @@ namespace mge
 		{
 			throw std::runtime_error(e.what());
 		}
+	}
+
+	bool Window::ShouldClose()
+	{
+		return glfwWindowShouldClose(window);
+	}
+
+	void Window::Close()
+	{
+		glfwSetWindowShouldClose(window, true);
 	}
 
 	void Window::Destroy()
