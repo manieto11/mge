@@ -1,11 +1,11 @@
-#ifndef MGE_H
+#if !defined(MGE_H)
 #define MGE_H
 
 #ifndef MGE_EXCLUDE_INPUT
-#include "input.h"
+#include "input.hpp"
 #endif
 #ifndef MGE_EXCLUDE_WINDOW
-#include "window.h"
+#include "window.hpp"
 #endif
 
 #endif

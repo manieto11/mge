@@ -1,4 +1,4 @@
-#ifndef MGE_WINDOW_H
+#if !defined(MGE_WINDOW_H)
 #define MGE_WINDOW_H
 
 #include <string>

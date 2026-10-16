@@ -1,4 +1,4 @@
-#ifndef MGE_INPUT_H
+#if !defined(MGE_INPUT_H)
 #define MGE_INPUT_H
 
 #include "glm/vec2.hpp"
