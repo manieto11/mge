@@ -16,11 +16,11 @@ VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
 namespace mge
 {
 #pragma region VulkanVariables
-	vk::Instance instance = VK_NULL_HANDLE;
-	vk::SurfaceKHR surface = VK_NULL_HANDLE;
-	vk::Device device = VK_NULL_HANDLE;
-	vk::CommandPool commandPool = VK_NULL_HANDLE;
-	vk::CommandBuffer commandBuffer = VK_NULL_HANDLE;
+	vk::Instance instance;
+	vk::SurfaceKHR surface;
+	vk::Device device;
+	vk::CommandPool commandPool;
+	vk::CommandBuffer commandBuffer;
 #pragma endregion
 
 	Window::Window(const std::string name, int width, int height)
@@ -52,8 +52,16 @@ namespace mge
 
 			std::cout << "Vulkan instance created successfully.\n";
 #endif
+      if(!glfwInit())
+        throw std::runtime_error("Could not initialize GLFW.");
 
 			window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+
+      if (window == nullptr)
+        throw std::runtime_error("Could not create window.");
+#if !defined(NDEBUG)
+      std::cout << "Window created successfully.\n";
+#endif
 
 			{
 				VkSurfaceKHR _surface;
@@ -130,5 +138,7 @@ namespace mge
 		}
 		if (instance != VK_NULL_HANDLE)
 			instance.destroy();
+
+    glfwTerminate();
 	}
 }

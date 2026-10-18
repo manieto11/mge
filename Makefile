@@ -5,6 +5,11 @@ NAME := mge
 # Options: {2D, 3D}
 DIMENSIONS := 3D
 
+# Options: {linux, windows}
+OS_TARGET  ?= linux
+# Options: {32, 64}
+BLD_TARGET ?= 64
+
 #-- Directories
 
 BIN_DIR := ./bin
@@ -16,8 +21,26 @@ TST_DIR := ./test
 
 #-- Compiling
 
-CC  := gcc
-CXX := g++
+ifeq ($(OS_TARGET),windows)
+	ifeq ($(BLD_TARGET),64)
+		CC  := x86_64-w64-mingw32-gcc
+		CXX := x86_64-w64-mingw32-g++
+	else
+		CC  := i686-w64-mingw32-gcc
+		CXX := i686-w64-mingw32-g++
+	endif
+else
+	CC  := gcc
+	CXX := g++
+	ifeq ($(BLD_TARGET),64)
+		CC  += -m64
+		CXX += -m64
+	else
+		CC  += -m32
+		CXX += -m32
+	endif
+
+endif
 
 C_FLAGS   :=
 CPP_FLAGS := -O2 -std=c++20
@@ -38,8 +61,11 @@ COPY  = @cp $1 $2
 INCLUDE := -I$(INC_DIR)
 
 #-- Libraries
-
-LIBS := -L$(LIB_DIR) -lmge $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
+ifeq ($(OS_TARGET),windows)
+	LIBS := -L$(LIB_DIR) -lmge -lvulkan-1 -lglfw3 -lgdi32 -luser32 -lshell32
+else
+	LIBS := -L$(LIB_DIR) -lmge $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
+endif
 
 #-- Objects
 
