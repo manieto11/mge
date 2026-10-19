@@ -1,5 +1,5 @@
 #if !defined(MGE_WINDOW_H)
-#define MGE_WINDOW_H
+#define MGE_WINDOW_HPP
 
 #include <string>
 

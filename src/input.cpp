@@ -52,7 +52,7 @@ namespace mge
     void Input::Initialize()
     {
         if (window == nullptr)
-            throw std::runtime_error("Window not initialized!");
+            throw std::runtime_error("Window not initialized.");
 
         modifiedKeys[0].reserve(16);
         modifiedKeys[1].reserve(16);
@@ -122,6 +122,9 @@ namespace mge
     {
         modifiedKeys[0].clear();
         modifiedKeys[1].clear();
+
+        modifiedMouseButtons[0].clear();
+        modifiedMouseButtons[1].clear();
     }
 
     bool Input::MouseDown(MouseButton button)

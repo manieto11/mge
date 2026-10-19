@@ -109,11 +109,11 @@ debug: clean $(LIB_DIR)/libmge.a
 release: clean $(LIB_DIR)/libmge.a
 
 #   -- Executable
-$(BIN_DIR)/test.exe: $(TST_DIR)/main.cpp
+$(BIN_DIR)/test.exe: $(TST_DIR)/main.cpp $(LIB_DIR)/libmge.a
 	$(call MKDIR,$(@D))
 	$(CXX) $(CPP_FLAGS) $(INCLUDE) $(TST_DIR)/main.cpp $(LIBS) -o $@
 
-test: debug $(BIN_DIR)/test.exe
+test: $(BIN_DIR)/test.exe
 	$(BIN_DIR)/test.exe
 
 #   -- Clean
