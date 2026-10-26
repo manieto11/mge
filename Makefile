@@ -116,6 +116,10 @@ $(BIN_DIR)/test.exe: $(TST_DIR)/main.cpp $(LIB_DIR)/libmge.a
 test: $(BIN_DIR)/test.exe
 	$(BIN_DIR)/test.exe
 
+# This is only for linux environment with no DE.
+render-test: $(BIN_DIR)/test.exe
+	cage -s -- foot 2> /dev/null
+
 #   -- Clean
 clean:
 	$(call RMDIR,$(BIN_DIR))
