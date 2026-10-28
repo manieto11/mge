@@ -80,7 +80,7 @@ $(BLD_DIR)/physics.o: CPP_FLAGS += $(PHY_FLAGS)
 
 #-- Rules
 
-.PHONY: all debug release test clean
+.PHONY: all debug release test run-test clean
 
 all: $(LIB_DIR)/libmge.a
 
@@ -114,12 +114,10 @@ $(BIN_DIR)/test.exe: $(TST_DIR)/main.cpp $(LIB_DIR)/libmge.a
 	$(CXX) $(CPP_FLAGS) $(INCLUDE) $(TST_DIR)/main.cpp $(LIBS) -o $@
 
 test: $(BIN_DIR)/test.exe
+
+run-test: test
 	$(BIN_DIR)/test.exe
-
-# This is only for linux environment with no DE.
-render-test: $(BIN_DIR)/test.exe
-	cage -s -- foot 2> /dev/null
-
+	
 #   -- Clean
 clean:
 	$(call RMDIR,$(BIN_DIR))
