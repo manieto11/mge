@@ -2,11 +2,6 @@
 
 NAME := mge
 
-# Options: {2D, 3D}
-DIMENSIONS := 3D
-
-# Options: {linux, windows}
-OS_TARGET  ?= linux
 # Options: {32, 64}
 BLD_TARGET ?= 64
 
@@ -21,25 +16,14 @@ TST_DIR := ./test
 
 #-- Compiling
 
-ifeq ($(OS_TARGET),windows)
-	ifeq ($(BLD_TARGET),64)
-		CC  := x86_64-w64-mingw32-gcc
-		CXX := x86_64-w64-mingw32-g++
-	else
-		CC  := i686-w64-mingw32-gcc
-		CXX := i686-w64-mingw32-g++
-	endif
+CC  := gcc
+CXX := g++
+ifeq ($(BLD_TARGET),64)
+	CC  += -m64
+	CXX += -m64
 else
-	CC  := gcc
-	CXX := g++
-	ifeq ($(BLD_TARGET),64)
-		CC  += -m64
-		CXX += -m64
-	else
-		CC  += -m32
-		CXX += -m32
-	endif
-
+	CC  += -m32
+	CXX += -m32
 endif
 
 C_FLAGS   :=
@@ -61,11 +45,10 @@ COPY  = @cp $1 $2
 INCLUDE := -I$(INC_DIR)
 
 #-- Libraries
-ifeq ($(OS_TARGET),windows)
-	LIBS := -L$(LIB_DIR) -lmge -lvulkan-1 -lglfw3 -lgdi32 -luser32 -lshell32
-else
-	LIBS := -L$(LIB_DIR) -lmge $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
-endif
+LIBS := -L$(LIB_DIR) -lmge 
+
+$(BIN_DIR)/test-window.exe: LIBS += $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
+$(BIN_DIR)/test-physics.exe: LIBS += $(shell $(PKG_CONFIG) --cflags --libs raylib)
 
 #-- Objects
 
@@ -80,7 +63,7 @@ $(BLD_DIR)/physics.o: CPP_FLAGS += $(PHY_FLAGS)
 
 #-- Rules
 
-.PHONY: all debug release test run-test clean
+.PHONY: all debug release tests run-tests clean
 
 all: $(LIB_DIR)/libmge.a
 
@@ -108,15 +91,18 @@ debug: clean $(LIB_DIR)/libmge.a
 
 release: clean $(LIB_DIR)/libmge.a
 
-#   -- Executable
-$(BIN_DIR)/test.exe: $(TST_DIR)/main.cpp $(LIB_DIR)/libmge.a
+#   -- Tests
+$(BIN_DIR)/test-%.exe: $(TST_DIR)/test-%.cpp $(LIB_DIR)/libmge.a
 	$(call MKDIR,$(@D))
-	$(CXX) $(CPP_FLAGS) $(INCLUDE) $(TST_DIR)/main.cpp $(LIBS) -o $@
+	$(CXX) $(CPP_FLAGS) $(INCLUDE) $< $(LIBS) -o $@
 
-test: $(BIN_DIR)/test.exe
+tests: $(BIN_DIR)/test-window.exe $(BIN_DIR)/test-physics.exe
 
-run-test: test
-	$(BIN_DIR)/test.exe
+test-physics: $(BIN_DIR)/test-physics.exe
+	$(BIN_DIR)/test-physics.exe
+
+test-window: $(BIN_DIR)/test-window.exe
+	$(BIN_DIR)/test-window.exe
 	
 #   -- Clean
 clean:
