@@ -1,5 +1,6 @@
 #include "mge/physics.hpp"
 
+#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -10,7 +11,7 @@ namespace mge
 
     const float FIXED_STEP = 0.02f;
 
-    const glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
+    const glm::vec3 gravity =  glm::vec3(0.0f, -9.81f, 0.0f);
 
     struct dynamic_cube
     {
@@ -26,6 +27,20 @@ namespace mge
 
     namespace
     {
+        bool collision(glm::vec3 minA, glm::vec3 maxA, glm::vec3 p)
+        {
+            return minA.x > p.x && maxA.x < p.x &&
+                   minA.y > p.y && maxA.y < p.y &&
+                   minA.z > p.z && maxA.z < p.z;
+        }
+
+        bool collision(glm::vec3 minA, glm::vec3 maxA, glm::vec3 minB, glm::vec3 maxB)
+        {
+            return minA.x < maxB.x && maxA.x > minB.x &&
+                   minA.y < maxB.y && maxA.y > minB.y &&
+                   minA.z < maxB.z && maxA.z > minB.z;
+        }
+
         void solveCollision(dynamic_cube &a, dynamic_cube &b)
         {
             glm::vec3 minA = a.position;
@@ -33,11 +48,7 @@ namespace mge
             glm::vec3 minB = b.position;
             glm::vec3 maxB = b.position + b.size;
 
-            bool collision = minA.x < maxB.x && maxA.x > minB.x &&
-                             minA.y < maxB.y && maxA.y > minB.y &&
-                             minA.z < maxB.z && maxA.z > minB.z;
-
-            if (!collision)
+            if (!collision(minA, maxA, minB, maxB))
                 return;
 
             float overlapX = std::min(maxA.x - minB.x, maxB.x - minA.x);
@@ -78,7 +89,7 @@ namespace mge
             }
             else
             {
-                if (maxA.y - minB.y < maxB.y - minA.y)
+                if (maxA.z - minB.z < maxB.z - minA.z)
                 {
                     a.position.z -= overlapZ * 0.5f;
                     b.position.z += overlapZ * 0.5f;
@@ -101,11 +112,7 @@ namespace mge
             glm::vec3 minB = b.position;
             glm::vec3 maxB = b.position + b.size;
 
-            bool collision = minA.x < maxB.x && maxA.x > minB.x &&
-                             minA.y < maxB.y && maxA.y > minB.y &&
-                             minA.z < maxB.z && maxA.z > minB.z;
-
-            if (!collision)
+            if (!collision(minA, maxA, minB, maxB))
                 return;
 
             float overlapX = std::min(maxA.x - minB.x, maxB.x - minA.x);
@@ -161,6 +168,10 @@ namespace mge
     {
         dynamic_cubes.reserve(MAX_DYNAMIC_CUBES);
         static_cubes.reserve(MAX_STATIC_CUBES);
+
+#ifndef NDEBUG
+        std::cout << "Physics solver initialized successfully.\n";
+#endif
     }
 
     void PhysicsSolver::Finalize()
@@ -178,7 +189,7 @@ namespace mge
     {
         for (int i = 0; i < dynamic_cubes.size(); ++i)
         {
-            dynamic_cube& d_cube = dynamic_cubes[i];
+            dynamic_cube &d_cube = dynamic_cubes[i];
 
             if (d_cube.deleted)
                 continue;
@@ -188,9 +199,9 @@ namespace mge
 
             d_cube.position += FIXED_STEP * d_cube.velocity;
 
-            for (int j = 0; j < dynamic_cubes.size(); ++j)
+            for (int j = i + 1; j < dynamic_cubes.size(); ++j)
             {
-                dynamic_cube& d_cube2 = dynamic_cubes[i];
+                dynamic_cube &d_cube2 = dynamic_cubes[j];
 
                 if (d_cube2.deleted)
                     continue;
