@@ -28,10 +28,70 @@ namespace mge
     {
         void solveCollision(dynamic_cube &a, dynamic_cube &b)
         {
-            glm::vec3 maxA = a.position + a.size, maxB = b.position + b.size;
+            glm::vec3 minA = a.position;
+            glm::vec3 maxA = a.position + a.size;
+            glm::vec3 minB = b.position;
+            glm::vec3 maxB = b.position + b.size;
 
-            bool collision = a.position.x <= maxB.x && a.position.y <= maxB.y && a.position.z <= maxB.z &&
-                             b.position.x <= maxA.x && b.position.y <= maxA.y && b.position.z <= maxA.z;
+            bool collision = minA.x < maxB.x && maxA.x > minB.x &&
+                             minA.y < maxB.y && maxA.y > minB.y &&
+                             minA.z < maxB.z && maxA.z > minB.z;
+
+            if (!collision)
+                return;
+
+            float overlapX = std::min(maxA.x - minB.x, maxB.x - minA.x);
+            float overlapY = std::min(maxA.y - minB.y, maxB.y - minA.y);
+            float overlapZ = std::min(maxA.z - minB.z, maxB.z - minA.z);
+
+            if (overlapY <= overlapX && overlapY <= overlapZ)
+            {
+                if (maxA.y - minB.y < maxB.y - minA.y)
+                {
+                    a.position.y -= overlapY * 0.5f;
+                    b.position.y += overlapY * 0.5f;
+                }
+                else
+                {
+                    a.position.y += overlapY * 0.5f;
+                    b.position.y -= overlapY * 0.5f;
+                }
+
+                a.velocity.y = 0.0f;
+                b.velocity.y = 0.0f;
+            }
+            else if (overlapX <= overlapZ)
+            {
+                if (maxA.x - minB.x < maxB.x - minA.x)
+                {
+                    a.position.x -= overlapX * 0.5f;
+                    b.position.x += overlapX * 0.5f;
+                }
+                else
+                {
+                    a.position.x += overlapX * 0.5f;
+                    b.position.x -= overlapX * 0.5f;
+                }
+
+                a.velocity.x = 0.0f;
+                b.velocity.x = 0.0f;
+            }
+            else
+            {
+                if (maxA.y - minB.y < maxB.y - minA.y)
+                {
+                    a.position.z -= overlapZ * 0.5f;
+                    b.position.z += overlapZ * 0.5f;
+                }
+                else
+                {
+                    a.position.z += overlapZ * 0.5f;
+                    b.position.z -= overlapZ * 0.5f;
+                }
+
+                a.velocity.z = 0.0f;
+                b.velocity.z = 0.0f;
+            }
         }
 
         void solveCollision(dynamic_cube &a, const static_cube &b)
@@ -41,11 +101,11 @@ namespace mge
             glm::vec3 minB = b.position;
             glm::vec3 maxB = b.position + b.size;
 
-            bool collision = minA.x >= maxB.x || maxA.x <= minB.x ||
-                             minA.y >= maxB.y || maxA.y <= minB.y ||
-                             minA.z >= maxB.z || maxA.z <= minB.z;
+            bool collision = minA.x < maxB.x && maxA.x > minB.x &&
+                             minA.y < maxB.y && maxA.y > minB.y &&
+                             minA.z < maxB.z && maxA.z > minB.z;
 
-            if (collision)
+            if (!collision)
                 return;
 
             float overlapX = std::min(maxA.x - minB.x, maxB.x - minA.x);
@@ -54,28 +114,28 @@ namespace mge
 
             if (overlapY <= overlapX && overlapY <= overlapZ)
             {
-                if (minA.y + a.size.y * 0.5f < minB.y + b.size.y * 0.5f)
-                    a.position.y = minB.y - a.size.y;
+                if (overlapY == maxA.y - minB.y)
+                    a.position.y -= overlapY;
                 else
-                    a.position.y = maxB.y;
+                    a.position.y += overlapY;
 
                 a.velocity.y = 0.0f;
             }
             else if (overlapX <= overlapZ)
             {
-                if (minA.x + a.size.x * 0.5f < minB.x + b.size.x * 0.5f)
-                    a.position.x = minB.x - a.size.x;
+                if (overlapX == maxA.x - minB.x)
+                    a.position.x -= overlapX;
                 else
-                    a.position.x = maxB.x;
+                    a.position.x += overlapX;
 
                 a.velocity.x = 0.0f;
             }
             else
             {
-                if (minA.z + a.size.z * 0.5f < minB.z + b.size.z * 0.5f)
-                    a.position.z = minB.z - a.size.z;
+                if (overlapZ == maxA.z - minB.z)
+                    a.position.z -= overlapZ;
                 else
-                    a.position.z = maxB.z;
+                    a.position.z += overlapZ;
 
                 a.velocity.z = 0.0f;
             }
@@ -116,8 +176,10 @@ namespace mge
 
     void PhysicsSolver::Step()
     {
-        for (auto &d_cube : dynamic_cubes)
+        for (int i = 0; i < dynamic_cubes.size(); ++i)
         {
+            dynamic_cube& d_cube = dynamic_cubes[i];
+
             if (d_cube.deleted)
                 continue;
 
@@ -125,6 +187,16 @@ namespace mge
                 d_cube.velocity += FIXED_STEP * gravity;
 
             d_cube.position += FIXED_STEP * d_cube.velocity;
+
+            for (int j = 0; j < dynamic_cubes.size(); ++j)
+            {
+                dynamic_cube& d_cube2 = dynamic_cubes[i];
+
+                if (d_cube2.deleted)
+                    continue;
+
+                solveCollision(d_cube, d_cube2);
+            }
 
             for (auto &s_cube : static_cubes)
             {
@@ -199,6 +271,11 @@ namespace mge
         deleted_static_cubes.emplace(sc);
     }
 
+    void PhysicsSolver::SetPosition(DynamicCube dc, glm::vec3 position)
+    {
+        dynamic_cubes[dc.id].position = position;
+    }
+
     glm::vec3 PhysicsSolver::GetPosition(DynamicCube dc)
     {
         return dynamic_cubes[dc.id].position;
@@ -207,6 +284,11 @@ namespace mge
     glm::vec3 PhysicsSolver::GetPosition(StaticCube sc)
     {
         return static_cubes[sc.id].position;
+    }
+
+    void PhysicsSolver::SetSize(DynamicCube dc, glm::vec3 size)
+    {
+        dynamic_cubes[dc.id].size = size;
     }
 
     glm::vec3 PhysicsSolver::GetSize(DynamicCube dc)

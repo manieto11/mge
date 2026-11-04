@@ -5,27 +5,28 @@
 
 #include <iostream>
 
-// Camera3D camera = {
-//     .position = {10.0f, 10.0f, 10.0f},
-//     .target = {0.0f, 0.0f, 0.0f},
-//     .up = {0.0f, 1.0f, 0.0f},
-//     .fovy = 10.0f,
-//     .projection = CameraProjection::CAMERA_ORTHOGRAPHIC,
-// };
-
 Camera3D camera = {
     .position = {10.0f, 10.0f, 10.0f},
     .target = {0.0f, 0.0f, 0.0f},
     .up = {0.0f, 1.0f, 0.0f},
-    .fovy = 60.0f,
-    .projection = CameraProjection::CAMERA_PERSPECTIVE,
+    .fovy = 16.0f,
+    .projection = CameraProjection::CAMERA_ORTHOGRAPHIC,
 };
+
+// Camera3D camera = {
+//     .position = {10.0f, 2.0f, 10.0f},
+//     .target = {0.0f, 0.0f, 0.0f},
+//     .up = {0.0f, 1.0f, 0.0f},
+//     .fovy = 90.0f,
+//     .projection = CameraProjection::CAMERA_PERSPECTIVE,
+// };
 
 const int N = 16;
 const float cubeSpeed = 5.0f;
 const float sqrt2div2 = 0.7071f;
 
 mge::DynamicCube d_cube;
+mge::DynamicCube d_cube2;
 mge::StaticCube s_cube;
 mge::StaticCube s_cube2;
 
@@ -41,6 +42,7 @@ int main()
     s_cube = mge::PhysicsSolver::CreateStaticCube(glm::vec3(-N / 2.0f, -1.0f, -N / 2.0f), glm::vec3(N, 1.0f, N));
     s_cube2 = mge::PhysicsSolver::CreateStaticCube(glm::vec3(6.0f, 1.0f, 6.0f), glm::vec3(2.0f, 1.0f, 2.0f));
     d_cube = mge::PhysicsSolver::CreateDynamicCube(glm::vec3(0.0f), glm::vec3(1.0f, 2.0f, 1.0f));
+    d_cube2 = mge::PhysicsSolver::CreateDynamicCube(glm::vec3(-5.0f, 5.0f, -5.0f), glm::vec3(3.0f));
 
     float time = 0.0f;
 
@@ -56,7 +58,7 @@ int main()
         if (IsGamepadAvailable(0))
         {
             i = GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
-            j = GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y);
+            j = - GetGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y);
         }
 
         if (IsKeyDown(KEY_W))
@@ -97,12 +99,22 @@ int main()
     CloseWindow();
 }
 
+void draw_shadow(mge::DynamicCube d_cube)
+{
+    glm::vec3 dPos = mge::PhysicsSolver::GetPosition(d_cube);
+    glm::vec3 dSize = mge::PhysicsSolver::GetSize(d_cube);
+
+    DrawCubeWiresV({dPos.x + dSize.x / 2.0f, 0.01f, dPos.z + dSize.z / 2.0f}, {dSize.x, 0.0f, dSize.z}, DARKGRAY);
+}
+
 void draw_cube(mge::DynamicCube d_cube)
 {
     glm::vec3 dPos = mge::PhysicsSolver::GetPosition(d_cube);
     glm::vec3 dSize = mge::PhysicsSolver::GetSize(d_cube);
 
     DrawCubeWiresV({dPos.x + dSize.x / 2.0f, dPos.y + dSize.y / 2.0f, dPos.z + dSize.z / 2.0f}, {dSize.x, dSize.y, dSize.z}, GREEN);
+
+    draw_shadow(d_cube);
 }
 
 void draw_cube(mge::StaticCube d_cube)
@@ -111,14 +123,6 @@ void draw_cube(mge::StaticCube d_cube)
     glm::vec3 dSize = mge::PhysicsSolver::GetSize(d_cube);
 
     DrawCubeWiresV({dPos.x + dSize.x / 2.0f, dPos.y + dSize.y / 2.0f, dPos.z + dSize.z / 2.0f}, {dSize.x, dSize.y, dSize.z}, BLUE);
-}
-
-void draw_shadow(mge::DynamicCube d_cube)
-{
-    glm::vec3 dPos = mge::PhysicsSolver::GetPosition(d_cube);
-    glm::vec3 dSize = mge::PhysicsSolver::GetSize(d_cube);
-
-    DrawCubeWiresV({dPos.x + dSize.x / 2.0f, 0.01f, dPos.z + dSize.z / 2.0f}, {dSize.x, 0.0f, dSize.z}, DARKGRAY);
 }
 
 
@@ -135,8 +139,7 @@ void render()
     draw_cube(s_cube);
     draw_cube(s_cube2);
     draw_cube(d_cube);
-
-    draw_shadow(d_cube);
+    draw_cube(d_cube2);
 
     EndMode3D();
 
