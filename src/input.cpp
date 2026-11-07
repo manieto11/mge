@@ -1,7 +1,4 @@
 #include "mge/input.hpp"
-
-#define GLFW_INCLUDE_NONE
-#include "GLFW/glfw3.h"
 #include "utils.h"
 
 #include <iostream>

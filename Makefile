@@ -55,8 +55,9 @@ INCLUDE := -I$(INC_DIR)
 #-- Libraries
 LIBS := -L$(LIB_DIR) -lmge 
 
-$(BIN_DIR)/test-window$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
+$(BIN_DIR)/test-input$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs glfw3)
 $(BIN_DIR)/test-physics$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs raylib)
+$(BIN_DIR)/test-window$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
 
 #-- Objects
 
