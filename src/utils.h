@@ -6,7 +6,8 @@
 
 #include <vector>
 
-namespace mge {
+namespace mge
+{
     extern GLFWwindow *window;
 
     extern VkInstance instance;

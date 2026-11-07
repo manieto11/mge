@@ -11,7 +11,7 @@ namespace mge
 
     const float FIXED_STEP = 0.02f;
 
-    const glm::vec3 gravity =  glm::vec3(0.0f, -9.81f, 0.0f);
+    const glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
 
     struct dynamic_cube
     {

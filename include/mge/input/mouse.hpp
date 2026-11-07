@@ -20,5 +20,4 @@ namespace mge
     };
 } // namespace mge
 
-
 #endif

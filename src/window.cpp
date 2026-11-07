@@ -761,12 +761,12 @@ namespace mge
             window = nullptr;
         }
 #ifndef NDEBUG
-            std::cout << "Window destroyed.\n";
+        std::cout << "Window destroyed.\n";
 #endif
 
         glfwTerminate();
 #ifndef NDEBUG
-            std::cout << "GLFW terminated.\n";
+        std::cout << "GLFW terminated.\n";
 #endif
     }
 

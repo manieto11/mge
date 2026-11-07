@@ -64,11 +64,7 @@ $(BIN_DIR)/test-window$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs 
 CORE_SRCS := $(wildcard $(SRC_DIR)/*.cpp)
 CORE_OBJS := $(patsubst $(SRC_DIR)/%.cpp, $(BLD_DIR)/%.o, $(CORE_SRCS))
 
-LIB_OBJ := $(CORE_OBJS) $(PHY_OBJS)
-
-#-- Target-Specific Variables
-# Append specific flags ONLY when compiling these exact files
-$(BLD_DIR)/physics.o: CPP_FLAGS += $(PHY_FLAGS)
+LIB_OBJ := $(CORE_OBJS)
 
 #-- Rules
 

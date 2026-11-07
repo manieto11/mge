@@ -68,7 +68,7 @@ namespace mge
         void Update() const;
 
         bool IsAvailable() const;
-        
+
         bool IsButtonDown(GamepadButton button) const;
         bool IsButtonPressed(GamepadButton button) const;
         bool IsButtonReleased(GamepadButton button) const;
