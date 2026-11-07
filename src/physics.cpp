@@ -183,6 +183,9 @@ namespace mge
         static_cubes.clear();
         while (!deleted_static_cubes.empty())
             deleted_static_cubes.pop();
+#ifndef NDEBUG
+        std::cout << "Physics solver finalized.\n";
+#endif
     }
 
     void PhysicsSolver::Step()

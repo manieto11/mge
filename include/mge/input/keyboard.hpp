@@ -1,5 +1,5 @@
-#if !defined(MGE_KEYBOARD_KEY_HPP)
-#define MGE_KEYBOARD_KEY_HPP
+#if !defined(MGE_KEYBOARD_HPP)
+#define MGE_KEYBOARD_HPP
 
 namespace mge
 {

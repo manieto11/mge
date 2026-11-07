@@ -1,5 +1,5 @@
-#if !defined(MGE_MOUSE_BUTTON_HPP)
-#define MGE_MOUSE_BUTTON_HPP
+#if !defined(MGE_MOUSE_HPP)
+#define MGE_MOUSE_HPP
 
 namespace mge
 {

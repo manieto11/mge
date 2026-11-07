@@ -2,8 +2,9 @@
 #define MGE_INPUT_HPP
 
 #include "glm/vec2.hpp"
-#include "input/keyboardKey.hpp"
-#include "input/mouseButton.hpp"
+#include "input/gamepad.hpp"
+#include "input/keyboard.hpp"
+#include "input/mouse.hpp"
 
 namespace mge
 {
@@ -18,6 +19,8 @@ namespace mge
         static void Initialize(void *window);
         static void Update();
         static void Finalize();
+
+        static const Gamepad GetGamepad(int id);
 
         static bool KeyDown(KeyboardKey key);
         static bool KeyPressed(KeyboardKey key);
