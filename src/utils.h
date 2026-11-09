@@ -6,6 +6,8 @@
 
 #include <vector>
 
+#define VK_ENABLE_VALIDATION // Comment to disable validation
+
 namespace mge
 {
     extern GLFWwindow *window;
@@ -14,7 +16,7 @@ namespace mge
     extern VkSurfaceKHR surface;
     extern VkExtent2D swapchain_extent;
 #ifdef VK_ENABLE_VALIDATION
-    extern constexpr bool enable_validation_layers;
+    inline constexpr bool enable_validation_layers = true;
     extern const std::vector<const char *> validation_layers;
     extern VkDebugUtilsMessengerEXT debug_messenger;
 #endif

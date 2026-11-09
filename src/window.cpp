@@ -7,8 +7,6 @@
 #include <stdexcept>
 #include <vector>
 
-// #define VK_ENABLE_VALIDATION // Destroy once all the code is copied!
-
 namespace mge
 {
     namespace

@@ -8,7 +8,6 @@ namespace mge
     VkSurfaceKHR surface = VK_NULL_HANDLE;
     VkExtent2D swapchain_extent;
 #ifdef VK_ENABLE_VALIDATION
-    constexpr bool enable_validation_layers = true;
     const std::vector<const char *> validation_layers = {"VK_LAYER_KHRONOS_validation"};
     VkDebugUtilsMessengerEXT debug_messenger = VK_NULL_HANDLE;
 #endif
