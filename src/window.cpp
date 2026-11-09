@@ -211,8 +211,7 @@ namespace mge
 
         VkExtent2D choose_swapchain_extent(const VkSurfaceCapabilitiesKHR &capabilities, GLFWwindow *window)
         {
-            if (capabilities.currentExtent.width !=
-                std::numeric_limits<uint32_t>::max())
+            if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
             {
                 return capabilities.currentExtent;
             }
@@ -298,12 +297,17 @@ namespace mge
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+#ifndef NDEBUG
+            std::cout << "Window created, " << width << 'x' << height<<".\n";
+#endif
 
         if (window == nullptr)
         {
             glfwTerminate();
             throw std::runtime_error("GLFW window creation failed.");
         }
+
+        glfwPollEvents();
 
         try
         {
@@ -314,7 +318,6 @@ namespace mge
                 throw std::runtime_error("Could not retrieve GLFW Vulkan extensions.");
 
             std::vector<const char *> extensions(glfw_extensions, glfw_extensions + extension_count);
-
 #ifdef VK_ENABLE_VALIDATION
             extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
@@ -336,7 +339,6 @@ namespace mge
                 .enabledExtensionCount = static_cast<uint32_t>(extensions.size()),
                 .ppEnabledExtensionNames = extensions.data(),
             };
-
 #ifdef VK_ENABLE_VALIDATION
             VkDebugUtilsMessengerCreateInfoEXT debug_create_info{
                 .sType =
@@ -363,18 +365,15 @@ namespace mge
             VkResult result = vkCreateInstance(&instance_info, nullptr, &instance);
             if (result != VK_SUCCESS)
                 throw std::runtime_error("Vulkan instance creation failed.");
-
 #ifdef VK_ENABLE_VALIDATION
             check_vk(create_debug_messenger(instance, &debug_create_info, nullptr, &debug_messenger), "create_debug_messenger");
 #endif
-
 #ifndef NDEBUG
             std::cout << "Vulkan instance created successfully.\n";
 #endif
 
             surface = VK_NULL_HANDLE;
             check_vk(glfwCreateWindowSurface(instance, window, nullptr, &surface), "glfwCreateWindowSurface");
-
 #ifndef NDEBUG
             std::cout << "Vulkan window surface created successfully.\n";
 #endif
@@ -389,7 +388,6 @@ namespace mge
             std::vector<VkPhysicalDevice> devices(device_count);
 
             check_vk(vkEnumeratePhysicalDevices(instance, &device_count, devices.data()), "vkEnumeratePhysicalDevices");
-
 #ifndef NDEBUG
             std::cout << "Found " << device_count << " Vulkan device(s).\n";
 #endif
@@ -401,7 +399,6 @@ namespace mge
             {
                 VkPhysicalDeviceProperties properties{};
                 vkGetPhysicalDeviceProperties(device, &properties);
-
 #ifndef NDEBUG
                 std::cout << "  " << properties.deviceName << '\n';
 #endif

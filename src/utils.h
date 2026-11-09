@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#define VK_ENABLE_VALIDATION // Comment to disable validation
+// #define VK_ENABLE_VALIDATION // Comment to disable validation
 
 namespace mge
 {
