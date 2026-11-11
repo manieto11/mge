@@ -35,11 +35,11 @@ else
 endif
 
 C_FLAGS   ?=
-CPP_FLAGS ?= -O2 -std=c++20
+CPP_FLAGS ?= -std=c++20
 
-debug: CPP_FLAGS += -g
+debug: CPP_FLAGS += -O2 -g
 
-release: CPP_FLAGS += -DNDEBUG
+release: CPP_FLAGS += -O3 -DNDEBUG
 
 PKG_CONFIG ?= pkg-config
 
