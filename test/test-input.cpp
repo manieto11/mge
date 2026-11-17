@@ -23,11 +23,20 @@ int main()
 
         for (int i = 0; i < 16; ++i)
         {
-            if (mge::Gamepad(i).IsAvailable())
+            if (!mge::Input::GetGamepad(i).IsAvailable())
                 continue;
 
             if (mge::Input::GetGamepad(i).IsButtonPressed(mge::GamepadButton::A))
-                std::cout << "Gamepad button A pressed.\n";
+                std::cout << "Gamepad " << i << " button A pressed.\n";
+            if (mge::Input::GetGamepad(i).IsButtonReleased(mge::GamepadButton::B))
+                std::cout << "Gamepad " << i << " button B released.\n";
+            if (mge::Input::GetGamepad(i).IsButtonPressed(mge::GamepadButton::X))
+                std::cout << "Gamepad " << i << " button X pressed.\n";
+            if (mge::Input::GetGamepad(i).IsButtonPressed(mge::GamepadButton::Y))
+                std::cout << "Gamepad " << i << " button Y pressed.\n";
+
+            if (mge::Input::GetGamepad(i).GetAxis(mge::GamepadAxis::RT) > 0.5f)
+                std::cout << "Gamepad " << i << " RT > 0.5f.\n";
         }
 
         mge::Window::BeginFrame();
