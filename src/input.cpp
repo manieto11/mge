@@ -23,7 +23,7 @@ namespace mge
 
     void joystick_callback(int jid, int event)
     {
-        if (jid >= MAX_GAMEPADS)
+        if (jid >= MAX_GAMEPADS || jid < 0)
         {
 #ifndef NDEBUG
             std::cout << "Gamepad " << jid << " not available.\n";
@@ -33,11 +33,10 @@ namespace mge
 
         if (event == GLFW_CONNECTED)
         {
-            availableGamepad[jid] = glfwJoystickIsGamepad(jid);
+            availableGamepad[jid] = true;
 #ifndef NDEBUG
             std::cout << "Gamepad " << jid << " connected.\n";
 #endif
-
             mge::Input::GetGamepad(jid).Initialize();
         }
         else if (event == GLFW_DISCONNECTED)
@@ -85,6 +84,9 @@ namespace mge
             throw std::runtime_error("Window not initialized.");
 
         glfwSetJoystickCallback(joystick_callback);
+#ifndef NDEBUG
+        std::cout << "Joystick callback set.\n";
+#endif
 
         for (int i = 0; i < MAX_GAMEPADS; ++i)
         {

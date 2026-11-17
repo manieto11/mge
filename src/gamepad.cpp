@@ -18,6 +18,9 @@ namespace mge
 
     void Gamepad::Update() const
     {
+        if (index < 0)
+            return;
+
         prevStates[index] = currStates[index];
         glfwGetGamepadState(index, &currStates[index]);
     }

@@ -1,35 +1,39 @@
-#include "GLFW/glfw3.h"
-#include "mge/input.hpp"
+#include "mge/mge.hpp"
 
 #include <iostream>
 
 int main()
 {
-    glfwInit();
 
-    GLFWwindow *window = glfwCreateWindow(800, 600, "test input", nullptr, nullptr);
+    mge::Window::Create("test window", 800, 600);
+    mge::Input::Initialize();
 
-    mge::Input::Initialize(window);
+    mge::Window::SetBackgroundColor(1, 1, 1);
 
-    while (!glfwWindowShouldClose(window))
+    while (!mge::Window::ShouldClose())
     {
-        glfwPollEvents();
-
         mge::Input::Update();
 
         if (mge::Input::KeyPressed(mge::KeyboardKey::ESCAPE))
-            glfwSetWindowShouldClose(window, true);
+            mge::Window::Close();
         if (mge::Input::KeyPressed(mge::KeyboardKey::SPACE))
             std::cout << "Key space pressed.\n";
         if (mge::Input::MousePressed(mge::MouseButton::LEFT))
             std::cout << "Mouse button left pressed.\n";
-        if (mge::Input::GetGamepad(0).IsButtonPressed(mge::GamepadButton::LSB))
-            std::cout << "Gamepad button LSB pressed.\n";
 
-        // std::cout << "Gamepad RT axis = " << mge::Input::GetGamepad(0).GetAxis(mge::GamepadAxis::RT) << ".\n";
+        for (int i = 0; i < 16; ++i)
+        {
+            if (mge::Gamepad(i).IsAvailable())
+                continue;
+
+            if (mge::Input::GetGamepad(i).IsButtonPressed(mge::GamepadButton::A))
+                std::cout << "Gamepad button A pressed.\n";
+        }
+
+        mge::Window::BeginFrame();
+        mge::Window::EndFrame();
     }
 
+    mge::Window::Destroy();
     mge::Input::Finalize();
-
-    glfwTerminate();
 }
