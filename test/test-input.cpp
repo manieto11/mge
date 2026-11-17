@@ -5,7 +5,7 @@
 int main()
 {
 
-    mge::Window::Create("test window", 800, 600);
+    mge::Window::Create("test-window", 800, 600);
     mge::Input::Initialize();
 
     mge::Window::SetBackgroundColor(1, 1, 1);

@@ -36,7 +36,7 @@ void render();
 
 int main()
 {
-    InitWindow(800, 600, "test physics");
+    InitWindow(800, 600, "test-physics");
     SetTargetFPS(60);
 
     mge::PhysicsSolver::Initialize();
