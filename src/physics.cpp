@@ -154,17 +154,17 @@ namespace mge
     std::vector<static_cube> static_cubes;
     std::queue<StaticCube> deleted_static_cubes;
 
-    PhysicsSolver::PhysicsSolver()
+    Physics::Physics()
     {
-        mge::PhysicsSolver::Initialize();
+        mge::Physics::Initialize();
     }
 
-    PhysicsSolver::~PhysicsSolver()
+    Physics::~Physics()
     {
-        mge::PhysicsSolver::Finalize();
+        mge::Physics::Finalize();
     }
 
-    void PhysicsSolver::Initialize()
+    void Physics::Initialize()
     {
         dynamic_cubes.reserve(MAX_DYNAMIC_CUBES);
         static_cubes.reserve(MAX_STATIC_CUBES);
@@ -174,7 +174,7 @@ namespace mge
 #endif
     }
 
-    void PhysicsSolver::Finalize()
+    void Physics::Finalize()
     {
         dynamic_cubes.clear();
         while (!deleted_dynamic_cubes.empty())
@@ -188,7 +188,7 @@ namespace mge
 #endif
     }
 
-    void PhysicsSolver::Step()
+    void Physics::Step()
     {
         for (int i = 0; i < dynamic_cubes.size(); ++i)
         {
@@ -222,7 +222,7 @@ namespace mge
         }
     }
 
-    DynamicCube PhysicsSolver::CreateDynamicCube(glm::vec3 position, glm::vec3 size, glm::vec3 velocity)
+    DynamicCube Physics::CreateDynamicCube(glm::vec3 position, glm::vec3 size, glm::vec3 velocity)
     {
         DynamicCube dc;
 
@@ -248,7 +248,7 @@ namespace mge
         return dc;
     }
 
-    StaticCube PhysicsSolver::CreateStaticCube(glm::vec3 position, glm::vec3 size)
+    StaticCube Physics::CreateStaticCube(glm::vec3 position, glm::vec3 size)
     {
         StaticCube sc;
 
@@ -273,58 +273,58 @@ namespace mge
         return sc;
     }
 
-    void PhysicsSolver::DestroyCube(DynamicCube dc)
+    void Physics::DestroyCube(DynamicCube dc)
     {
         dynamic_cubes[dc.id].deleted = true;
         deleted_dynamic_cubes.emplace(dc);
     }
 
-    void PhysicsSolver::DestroyCube(StaticCube sc)
+    void Physics::DestroyCube(StaticCube sc)
     {
         static_cubes[sc.id].deleted = true;
         deleted_static_cubes.emplace(sc);
     }
 
-    void PhysicsSolver::SetPosition(DynamicCube dc, glm::vec3 position)
+    void Physics::SetPosition(DynamicCube dc, glm::vec3 position)
     {
         dynamic_cubes[dc.id].position = position;
     }
 
-    glm::vec3 PhysicsSolver::GetPosition(DynamicCube dc)
+    glm::vec3 Physics::GetPosition(DynamicCube dc)
     {
         return dynamic_cubes[dc.id].position;
     }
 
-    glm::vec3 PhysicsSolver::GetPosition(StaticCube sc)
+    glm::vec3 Physics::GetPosition(StaticCube sc)
     {
         return static_cubes[sc.id].position;
     }
 
-    void PhysicsSolver::SetSize(DynamicCube dc, glm::vec3 size)
+    void Physics::SetSize(DynamicCube dc, glm::vec3 size)
     {
         dynamic_cubes[dc.id].size = size;
     }
 
-    glm::vec3 PhysicsSolver::GetSize(DynamicCube dc)
+    glm::vec3 Physics::GetSize(DynamicCube dc)
     {
         return dynamic_cubes[dc.id].size;
     }
 
-    glm::vec3 PhysicsSolver::GetSize(StaticCube sc)
+    glm::vec3 Physics::GetSize(StaticCube sc)
     {
         return static_cubes[sc.id].size;
     }
 
-    void PhysicsSolver::SetVelocity(DynamicCube dc, glm::vec3 velocity)
+    void Physics::SetVelocity(DynamicCube dc, glm::vec3 velocity)
     {
         dynamic_cubes[dc.id].velocity = velocity;
     }
 
-    glm::vec3 PhysicsSolver::GetVelocity(DynamicCube sc)
+    glm::vec3 Physics::GetVelocity(DynamicCube sc)
     {
         return dynamic_cubes[sc.id].velocity;
     }
-    glm::vec3 PhysicsSolver::GetVelocity(StaticCube sc)
+    glm::vec3 Physics::GetVelocity(StaticCube sc)
     {
         return glm::vec3(0.0f);
     }

@@ -5,10 +5,11 @@
 int main()
 {
 
-    mge::Window::Create("test-window", 800, 600);
+    mge::Window::Create("test-input", 800, 600);
+    mge::Renderer::Initialize();
     mge::Input::Initialize();
 
-    mge::Window::SetBackgroundColor(1, 1, 1);
+    mge::Renderer::SetBackgroundColor(1, 1, 1);
 
     while (!mge::Window::ShouldClose())
     {
@@ -39,10 +40,11 @@ int main()
                 std::cout << "Gamepad " << i << " RT > 0.5f.\n";
         }
 
-        mge::Window::BeginFrame();
-        mge::Window::EndFrame();
+        mge::Renderer::BeginFrame();
+        mge::Renderer::EndFrame();
     }
 
+    mge::Renderer::Finalize();
     mge::Window::Destroy();
     mge::Input::Finalize();
 }

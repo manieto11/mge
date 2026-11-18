@@ -1,4 +1,4 @@
-#if !defined(MGE_GAMEPAD_HPP)
+#if !defined(MGE_GAMEPAD_HPP) && !defined(MGE_EXCLUDE_INPUT)
 #define MGE_GAMEPAD_HPP
 
 namespace mge

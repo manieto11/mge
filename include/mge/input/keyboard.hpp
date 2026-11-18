@@ -1,4 +1,4 @@
-#if !defined(MGE_KEYBOARD_HPP)
+#if !defined(MGE_KEYBOARD_HPP) && !defined(MGE_EXCLUDE_INPUT)
 #define MGE_KEYBOARD_HPP
 
 namespace mge

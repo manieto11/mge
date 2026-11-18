@@ -1,14 +1,18 @@
 #if !defined(MGE_HPP)
 #define MGE_HPP
 
-#if !defined(MGE_EXCLUDE_PHYSICS)
-#include "physics.hpp"
-#endif
-#if !defined(MGE_EXCLUDE_INPUT)
-#include "input.hpp"
-#endif
-#if !defined(MGE_EXCLUDE_WINDOW)
-#include "window.hpp"
-#endif
+#include "mge/audio.hpp"
+#include "mge/exceptions.hpp"
+#include "mge/input.hpp"
+#include "mge/physics.hpp"
+#include "mge/renderer.hpp"
+#include "mge/window.hpp"
+
+namespace mge
+{
+    void InitializeEngine();
+    void FinalizeEngine();
+} // namespace mge
+
 
 #endif

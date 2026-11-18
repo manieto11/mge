@@ -55,8 +55,10 @@ INCLUDE := -I$(INC_DIR)
 #-- Libraries
 LIBS := -L$(LIB_DIR) -lmge 
 
+$(BIN_DIR)/test-audio$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
 $(BIN_DIR)/test-input$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
 $(BIN_DIR)/test-physics$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs raylib)
+$(BIN_DIR)/test-renderer$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
 $(BIN_DIR)/test-window$(BIN_EXT): LIBS += $(shell $(PKG_CONFIG) --cflags --libs vulkan glfw3)
 
 #-- Objects
@@ -92,18 +94,17 @@ $(BIN_DIR)/test-%$(BIN_EXT): $(TST_DIR)/test-%.cpp $(LIB_DIR)/lib$(NAME).a
 	$(call MKDIR,$(@D))
 	$(CXX) $(CPP_FLAGS) $(INCLUDE) $< $(LIBS) -o $@
 
-tests: $(BIN_DIR)/test-input$(BIN_EXT) $(BIN_DIR)/test-physics$(BIN_EXT) $(BIN_DIR)/test-window$(BIN_EXT)
+tests: $(BIN_DIR)/test-audio$(BIN_EXT) $(BIN_DIR)/test-input$(BIN_EXT) $(BIN_DIR)/test-physics$(BIN_EXT) $(BIN_DIR)/test-renderer$(BIN_EXT) $(BIN_DIR)/test-window$(BIN_EXT)
 
 test-all: tests
+	$(BIN_DIR)/test-audio$(BIN_EXT)
 	$(BIN_DIR)/test-input$(BIN_EXT)
 	$(BIN_DIR)/test-physics$(BIN_EXT)
+	$(BIN_DIR)/test-renderer$(BIN_EXT)
 	$(BIN_DIR)/test-window$(BIN_EXT)
 
 test-%: $(BIN_DIR)/test-%$(BIN_EXT)
 	$<
-
-test-window: $(BIN_DIR)/test-window$(BIN_EXT)
-	$(BIN_DIR)/test-window$(BIN_EXT)
 
 #-- Installation
 

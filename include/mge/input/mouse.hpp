@@ -1,4 +1,4 @@
-#if !defined(MGE_MOUSE_HPP)
+#if !defined(MGE_MOUSE_HPP) && !defined(MGE_EXCLUDE_INPUT)
 #define MGE_MOUSE_HPP
 
 namespace mge

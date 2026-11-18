@@ -3,6 +3,7 @@
 namespace mge
 {
     GLFWwindow *window = nullptr;
+    const char *application_name = "mge application";
 
     VkInstance instance = VK_NULL_HANDLE;
     VkSurfaceKHR surface = VK_NULL_HANDLE;

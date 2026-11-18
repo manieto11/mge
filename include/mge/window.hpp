@@ -1,5 +1,7 @@
-#if !defined(MGE_WINDOW_H)
+#if !defined(MGE_WINDOW_HPP) && !defined(MGE_DISABLE_WINDOW)
 #define MGE_WINDOW_HPP
+
+#include "glm/vec2.hpp"
 
 #include <string>
 
@@ -16,13 +18,17 @@ namespace mge
         static void Close();
         static void Destroy();
 
-        static void BeginFrame();
-        static void EndFrame();
+        static int GetWidth();
+        static void SetWidth(int width);
 
-        static void Draw2D();
-        static void Draw3D();
+        static int GetHeight();
+        static void SetHeight(int height);
 
-        static void SetBackgroundColor(float r, float g, float b);
+        static glm::ivec2 GetSize();
+        static void SetSize(glm::ivec2 size);
+
+        static glm::ivec2 GetPosition();
+        static void SetPosition(glm::ivec2 position);
     };
 } // namespace mge
 

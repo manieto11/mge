@@ -11,6 +11,7 @@
 namespace mge
 {
     extern GLFWwindow *window;
+    extern const char *application_name;
 
     extern VkInstance instance;
     extern VkSurfaceKHR surface;

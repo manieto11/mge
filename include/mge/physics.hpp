@@ -1,4 +1,4 @@
-#if !defined(MGE_PHYSICS_HPP)
+#if !defined(MGE_PHYSICS_HPP) && !defined(MGE_DISABLE_PHYSICS)
 #define MGE_PHYSICS_HPP
 
 #include "glm/vec3.hpp"
@@ -14,11 +14,11 @@ namespace mge
         unsigned int id;
     };
 
-    class PhysicsSolver
+    class Physics
     {
     public:
-        PhysicsSolver();
-        ~PhysicsSolver();
+        Physics();
+        ~Physics();
 
         static void Initialize();
         static void Finalize();
